@@ -1,7 +1,14 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>SolarLive Dashboard</title>
 
@@ -16,143 +23,217 @@
 
 <body>
 
-<h1>⚡ Solar Energy Estimation Dashboard</h1>
+<div class="container">
 
-<div class="controls">
+    <h1>
+        ⚡ SolarLive AI Dashboard
+    </h1>
 
-    <input
-        type="text"
-        id="city"
-        list="cities"
-        placeholder="Enter City Name"
-        value="Jaipur"
+
+
+    <div class="controls">
+
+        <input
+            type="text"
+            id="city"
+            list="cities"
+            placeholder="Enter City"
+            value="Jaipur"
+        >
+
+        <datalist id="cities">
+
+            <option value="Jaipur">
+            <option value="Delhi">
+            <option value="Mumbai">
+            <option value="Pune">
+            <option value="Bangalore">
+            <option value="Chennai">
+            <option value="Hyderabad">
+            <option value="Kolkata">
+            <option value="Ahmedabad">
+            <option value="Surat">
+
+        </datalist>
+
+
+        <input
+            type="number"
+            id="panel"
+            placeholder="Panel Capacity"
+            value="5"
+        >
+
+
+        <button onclick="predict()">
+            Estimate
+        </button>
+
+
+        <button onclick="getLocation()">
+            Use My Location
+        </button>
+
+
+        <button onclick="toggleTheme()">
+            Toggle Theme
+        </button>
+
+    </div>
+
+
+
+    <div class="cards">
+
+        <div class="card">
+
+            <h3>🌡 Temperature</h3>
+
+            <p id="temp">--</p>
+
+        </div>
+
+
+
+        <div class="card">
+
+            <h3>☁ Clouds</h3>
+
+            <p id="clouds">--</p>
+
+        </div>
+
+
+
+        <div class="card">
+
+            <h3>☀ Solar Radiation</h3>
+
+            <p id="radiation">--</p>
+
+        </div>
+
+
+
+        <div class="card highlight">
+
+            <h3>⚡ Energy Output</h3>
+
+            <p id="energy">--</p>
+
+        </div>
+
+
+
+        <div class="card">
+
+            <h3>🔋 Efficiency</h3>
+
+            <p id="efficiency">--</p>
+
+        </div>
+
+    </div>
+
+
+
+    <div
+        id="alertBox"
+        class="alert-box"
     >
 
-    <datalist id="cities">
+        Waiting for analysis...
 
-        <option value="Jaipur">
-        <option value="Delhi">
-        <option value="Mumbai">
-        <option value="Pune">
-        <option value="Bangalore">
-        <option value="Hyderabad">
-        <option value="Chennai">
-        <option value="Kolkata">
-        <option value="Ahmedabad">
-        <option value="Surat">
-        <option value="Lucknow">
-        <option value="Indore">
-        <option value="Bhopal">
-        <option value="Patna">
-        <option value="Udaipur">
-        <option value="Jodhpur">
-
-    </datalist>
-
-<button onclick="toggleTheme()">
-    Toggle Theme
-</button>
-    <input
-        type="number"
-        id="panel"
-        placeholder="Panel Capacity (kW)"
-        value="5"
-    >
-
-    <button onclick="predict()">
-        Estimate
-    </button>
-
-    <button onclick="getLocation()">
-        Use My Location
-    </button>
-
-</div>
-
-
-<div class="cards">
-
-    <div class="card">
-        <h3>Temperature</h3>
-        <p id="temp">--</p>
     </div>
 
-    <div class="card">
-        <h3>Clouds</h3>
-        <p id="clouds">--</p>
-    </div>
 
-    <div class="card">
-        <h3>Solar Radiation</h3>
-        <p id="radiation">--</p>
-    </div>
 
-    <div class="card highlight">
-        <h3>Energy Output</h3>
-        <p id="energy">--</p>
-    </div>
+    <div class="graph-grid">
 
-    <div class="card">
-        <h3>Efficiency</h3>
-        <p id="efficiency">--</p>
+
+        <div class="graph-box energy-graph">
+
+            <canvas id="energyChart"></canvas>
+
+        </div>
+
+
+
+        <div class="graph-box">
+
+            <canvas id="hourlyChart"></canvas>
+
+        </div>
+
+
+
+        <div class="graph-box">
+
+            <canvas id="radiationChart"></canvas>
+
+        </div>
+
     </div>
 
 </div>
 
-
-<div id="alertBox" class="alert-box">
-
-    Waiting for analysis...
-
-</div>
-
-
-<div class="graph-grid">
-
-    <div class="graph-box">
-        <canvas id="energyChart"></canvas>
-    </div>
-
-    <div class="graph-box">
-        <canvas id="tempChart"></canvas>
-    </div>
-
-    <div class="graph-box">
-        <canvas id="radiationChart"></canvas>
-    </div>
-
-</div>
 
 
 <script>
 
 let energyChart;
-let tempChart;
+
+let hourlyChart;
+
 let radiationChart;
+
+
+
+function toggleTheme(){
+
+    document.body.classList.toggle(
+
+        "light-mode"
+
+    );
+
+}
+
 
 
 function predict(){
 
     let city =
+
         document.getElementById("city").value;
 
+
     let panel =
+
         document.getElementById("panel").value;
+
+
+
+    document.getElementById("alertBox")
+    .innerText =
+
+    "⏳ Fetching live weather and solar data...";
+
 
 
     fetch('/predict', {
 
-        method: 'POST',
+        method:'POST',
 
-        headers: {
-            'Content-Type': 'application/json'
+        headers:{
+            'Content-Type':'application/json'
         },
 
-        body: JSON.stringify({
+        body:JSON.stringify({
 
-            city: city,
+            city:city,
 
-            panel: panel
+            panel:panel
 
         })
 
@@ -162,61 +243,78 @@ function predict(){
 
     .then(data => {
 
+
+
         document.getElementById("temp")
         .innerText =
-            data.temperature + " °C";
+
+        data.temperature + " °C";
+
 
 
         document.getElementById("clouds")
         .innerText =
-            data.clouds + " %";
+
+        data.clouds + " %";
+
 
 
         document.getElementById("radiation")
         .innerText =
-            data.radiation + " W/m²";
+
+        data.radiation + " W/m²";
+
 
 
         document.getElementById("energy")
         .innerText =
-            data.energy + " kWh";
+
+        data.energy + " kWh";
+
 
 
         document.getElementById("efficiency")
         .innerText =
-            data.efficiency + " %";
+
+        data.efficiency + " %";
+
 
 
         // -------- ALERTS --------
 
+
         let message = "";
+
 
         if(data.energy < 2){
 
             message =
-            "⚠️ Low solar output today. Battery backup recommended.";
 
+            "⚠ Low solar output today. Battery backup recommended.";
         }
 
         else if(data.clouds > 70){
 
             message =
-            "☁️ Heavy cloud cover detected. Energy generation may decrease.";
 
+            "☁ Heavy cloud cover detected. Output may decrease.";
         }
 
         else if(data.efficiency < 70){
 
             message =
-            "⚡ Panel efficiency is lower than optimal conditions.";
 
+            "⚡ Efficiency is lower than optimal conditions.";
         }
 
         else{
 
             message =
+
             "✅ Solar conditions look good today.";
         }
+
+
 
         document.getElementById("alertBox")
         .innerText = message;
@@ -225,110 +323,205 @@ function predict(){
 
         // -------- ENERGY GRAPH --------
 
+
         const energyCtx =
-        document.getElementById('energyChart');
+
+        document.getElementById(
+
+            'energyChart'
+        );
+
 
         if(energyChart)
             energyChart.destroy();
 
-        energyChart = new Chart(energyCtx, {
 
-            type:'line',
 
-            data:{
+        energyChart = new Chart(
 
-                labels:[
-                    'Day 1',
-                    'Day 2',
-                    'Day 3',
-                    'Day 4',
-                    'Day 5',
-                    'Day 6',
-                    'Day 7'
-                ],
+            energyCtx,
 
-                datasets:[{
+            {
 
-                    label:'Energy Forecast',
+                type:'line',
 
-                    data:data.forecast,
+                data:{
 
-                    borderWidth:4,
+                    labels:
+                    data.forecast_days,
 
-                    tension:0.4,
+                    datasets:[{
 
-                    fill:true,
+                        label:
+                        '7-Day Energy Forecast',
 
-                    backgroundColor:
-                    'rgba(37,99,235,0.2)',
+                        data:
+                        data.forecast,
 
-                    borderColor:
-                    '#3b82f6'
-                }]
+                        borderColor:
+                        '#3b82f6',
+
+                        backgroundColor:
+                        'rgba(59,130,246,0.2)',
+
+                        fill:true,
+
+                        tension:0.4,
+
+                        borderWidth:4
+                    }]
+                }
             }
-        });
+        );
 
 
 
-        // -------- TEMP GRAPH --------
+        // -------- HOURLY GRAPH --------
 
-        const tempCtx =
-        document.getElementById('tempChart');
 
-        if(tempChart)
-            tempChart.destroy();
+        const hourlyCtx =
 
-        tempChart = new Chart(tempCtx, {
+        document.getElementById(
 
-            type:'bar',
+            'hourlyChart'
+        );
 
-            data:{
 
-                labels:[
-                    'Current Temp'
-                ],
+        if(hourlyChart)
+            hourlyChart.destroy();
 
-                datasets:[{
 
-                    label:'Temperature',
 
-                    data:[data.temperature],
+        hourlyChart = new Chart(
 
-                    backgroundColor:'#f97316'
-                }]
+            hourlyCtx,
+
+            {
+
+                type:'line',
+
+                data:{
+
+                    labels:[
+
+                        '0',
+                        '3',
+                        '6',
+                        '9',
+                        '12',
+                        '15',
+                        '18',
+                        '21'
+
+                    ],
+
+                    datasets:[{
+
+                        label:
+                        'Hourly Solar Radiation',
+
+                        data:[
+
+                            data.hourly_radiation[0],
+
+                            data.hourly_radiation[3],
+
+                            data.hourly_radiation[6],
+
+                            data.hourly_radiation[9],
+
+                            data.hourly_radiation[12],
+
+                            data.hourly_radiation[15],
+
+                            data.hourly_radiation[18],
+
+                            data.hourly_radiation[21]
+
+                        ],
+
+                        borderColor:
+                        '#22c55e',
+
+                        backgroundColor:
+                        'rgba(34,197,94,0.2)',
+
+                        fill:true,
+
+                        tension:0.4,
+
+                        borderWidth:4
+                    }]
+                }
             }
-        });
+        );
 
 
 
-        // -------- RADIATION GRAPH --------
+        // -------- EFFICIENCY GRAPH --------
+
 
         const radiationCtx =
-        document.getElementById('radiationChart');
+
+        document.getElementById(
+
+            'radiationChart'
+        );
+
 
         if(radiationChart)
             radiationChart.destroy();
 
-        radiationChart = new Chart(radiationCtx, {
 
-            type:'doughnut',
 
-            data:{
+        radiationChart = new Chart(
 
-                labels:[
-                    'Solar Radiation'
-                ],
+            radiationCtx,
 
-                datasets:[{
+            {
 
-                    data:[data.radiation],
+                type:'line',
 
-                    backgroundColor:[
-                        '#eab308'
-                    ]
-                }]
+                data:{
+
+                    labels:[
+
+                        'Morning',
+                        'Noon',
+                        'Evening'
+
+                    ],
+
+                    datasets:[{
+
+                        label:
+                        'Efficiency Trend',
+
+                        data:[
+
+                            data.efficiency - 10,
+
+                            data.efficiency,
+
+                            data.efficiency - 5
+
+                        ],
+
+                        borderColor:
+                        '#eab308',
+
+                        backgroundColor:
+                        'rgba(234,179,8,0.2)',
+
+                        fill:true,
+
+                        tension:0.4,
+
+                        borderWidth:4
+                    }]
+                }
             }
-        });
+        );
 
     });
 
@@ -343,10 +536,14 @@ function getLocation(){
         async function(position){
 
             let lat =
+
             position.coords.latitude;
 
+
             let lon =
+
             position.coords.longitude;
+
 
 
             let response = await fetch(
@@ -355,7 +552,13 @@ function getLocation(){
 
             );
 
-            let data = await response.json();
+
+
+            let data =
+
+            await response.json();
+
+
 
             let city =
 
@@ -366,22 +569,20 @@ function getLocation(){
                 data.address.village;
 
 
+
             document.getElementById("city").value =
+
             city;
 
+
+
             predict();
-
         }
-
     );
-
 }
 
-function toggleTheme(){
 
-    document.body.classList.toggle("light-mode");
 
-}
 window.onload = predict;
 
 </script>
